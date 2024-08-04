@@ -2,6 +2,10 @@
 
 # Krishna and Kaileo, with help of Tim
 
+# Make sure roscore is running before executing this script!
+
+# This script does not use rospy.publish(). 
+
 import std_msgs
 from std_msgs.msg import String
 import cv2 
@@ -25,7 +29,7 @@ def find_angle_to_object(x1,y1,x2,y2):
     return(angle)
 
 def inference(): 
-    pub = rospy.Publisher('/inference_results', String, queue_size=10) #try changing the 'chatter' part
+    pub = rospy.Publisher('chatter', String, queue_size=10) #try changing the 'chatter' part
     rospy.init_node('inference', anonymous = True)
     rate = rospy.Rate(10)
     
@@ -33,43 +37,82 @@ def inference():
         success, frame = cap.read()
 
         if success:
-            # run inference on one frame
-            results = model(source=frame, conf=0.3, show = True)
+            results = model(source=frame, conf=0.7, imgsz=640)
 
-            # get data from inference in ultralytics.engine.results.boxes object
-            # contains ordered lists with detection data
             boxes = results[0].boxes
-        
-            out = str(len(boxes.cls))
-
-            # for each detected object in the current frame
+            
             for i in range(len(boxes.cls)):
-            # data will be outputted through ros topic
+                # print statements will be changed to rospy publish stuff
+                print("")
+                print(classes[int(boxes.cls[i])])
+                print("confidence:", float(boxes.conf[i]))
                 left = float(boxes.xyxy[i][0])
                 top = float(boxes.xyxy[i][1])
                 right = float(boxes.xyxy[i][2])
                 bottom = float(boxes.xyxy[i][3])
-                
-                out += "{" + classes[int(boxes.cls[i])] + " " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom) + "} "
-                
-                rospy.loginfo(out)
-                pub.publish(out)
-                rate.sleep()
-                
-            # format
-            # numberofobjects {object1class object1top object1left object1bottom object1right object1anglefromcenter} {object1class object1top object1left object1bottom object1right object1anglefromcenter}
 
+                print("left:", left)
+                print("top:", top)
+                print("right:", right)
+                print("bottom:", bottom)
+                print("centroid: (" + str((float(boxes.xyxy[i][0]) + float(boxes.xyxy[i][2])) * 0.5) + ", " + str((float(boxes.xyxy[i][1]) + float(boxes.xyxy[i][3])) * 0.5) + ")")
+                print("offset from center: " + str(320 - (float(boxes.xyxy[i][0]) + float(boxes.xyxy[i][2])) * 0.5) + ", " + str(320 - (float(boxes.xyxy[i][1]) + float(boxes.xyxy[i][3])) * 0.5) + ")")
+                print(find_angle_to_object(left, top, right, bottom))
 
-        # shows the stuff
-        #cv2.imshow("YOLOv8 Inference (live)", results[0].plot())
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
+            cv2.imshow("YOLOv8 Inference (live)", results[0].plot())
+
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
         else:
             break
 
-while (True): 
-    if __name__ == '__main__':
-        try:
-            inference()
-        except rospy.ROSInterruptException:
-            pass
+if __name__ == '__main__':
+    try:
+        inference()
+    except rospy.ROSInterruptException:
+        pass
+
+
+
+
+
+
+
+
+
+"""
+
+
+
+while (True):
+    success, frame = cap.read()
+
+    if success:
+        results = model(source=frame, conf=0.7, imgsz=640)
+
+        boxes = results[0].boxes
+        for i in range(len(boxes.cls)):
+            # print statements will be changed to rospy publish stuff
+            print("")
+            print(classes[int(boxes.cls[i])])
+            print("confidence:", float(boxes.conf[i]))
+            left = float(boxes.xyxy[i][0])
+            top = float(boxes.xyxy[i][1])
+            right = float(boxes.xyxy[i][2])
+            bottom = float(boxes.xyxy[i][3])
+
+            print("left:", left)
+            print("top:", top)
+            print("right:", right)
+            print("bottom:", bottom)
+            print("centroid: (" + str((float(boxes.xyxy[i][0]) + float(boxes.xyxy[i][2])) * 0.5) + ", " + str((float(boxes.xyxy[i][1]) + float(boxes.xyxy[i][3])) * 0.5) + ")")
+            print("offset from center: " + str(320 - (float(boxes.xyxy[i][0]) + float(boxes.xyxy[i][2])) * 0.5) + ", " + str(320 - (float(boxes.xyxy[i][1]) + float(boxes.xyxy[i][3])) * 0.5) + ")")
+            print(find_angle_to_object(left, top, right, bottom))
+
+        cv2.imshow("YOLOv8 Inference (live)", results[0].plot())
+
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+    else:
+        break
+"""

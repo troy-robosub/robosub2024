@@ -17,7 +17,7 @@ def arm_submarine():
         else:
             rospy.logwarn("Failed to arm the submarine")
     except rospy.ServiceException as e:
-        rospy.logerr(f"Service call failed: {e}")
+        rospy.logerr(f"Arming failed: {e}")
 
 if __name__ == '__main__':
     try:

@@ -30,3 +30,8 @@ def disarm_submarine():
             rospy.logwarn("Failed to disarm the submarine")
     except rospy.ServiceException as e:
         rospy.logerr(f"Service call failed: {e}")
+if __name__ == '__main__':
+    try:
+        disarm_submarine()
+    except rospy.ROSInterruptException:
+        pass

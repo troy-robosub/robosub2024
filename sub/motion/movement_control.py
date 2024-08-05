@@ -12,7 +12,6 @@ disarm_submarine()
 pub_thrusters = rospy.Publisher("auv/devices/thrusters", mavros_msgs.msg.OverrideRCIn, queue_size=10)
 
 def movement(
-        self,
         yaw=None,
         forward=None,
         lateral=None,
@@ -21,21 +20,6 @@ def movement(
         vertical=0,
         **kwargs,
     ):
-        """
-        Move the robot in a given direction, by directly changing the PWM value of each thruster. This does not take input from the DVL.
-        This is a non-blocking function.
-        Inputs are between -5 and 5
-
-        Args:
-            yaw (float): Power for the yaw maneuver
-            forward (float): Power to move forward
-            lateral (float): Power for moving laterally (negative one way (less than 1500), positive the other way (more than 1500))
-            pitch (float): Power for the pitch maneuver
-            roll (float): Power for the roll maneuver
-            vertical (float): Distance to change the depth by
-
-        # TODO Handle timeout of the pixhawk
-        """
 
         pwm = mavros_msgs.msg.OverrideRCIn()
 

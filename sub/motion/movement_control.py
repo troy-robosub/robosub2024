@@ -3,13 +3,10 @@ import mavros_msgs.msg
 import mavros_msgs.srv
 import rospy
 from std_msgs.msg import Float64, Float32MultiArray
-from arm import arm_submarine
-from disarm import disarm_submarine
-## using mavros to apply major motion
-arm_submarine()
-disarm_submarine()
 
-pub_thrusters = rospy.Publisher("auv/devices/thrusters", mavros_msgs.msg.OverrideRCIn, queue_size=10)
+## using mavros to apply major motion
+
+pub_thrusters = rospy.Publisher("/mavros/rc/override", mavros_msgs.msg.OverrideRCIn, queue_size=10)
 
 def movement(
         yaw=None,
@@ -33,7 +30,7 @@ def movement(
         channels[7] = int((roll * 80) + 1500) if roll else 1500
         pwm.channels = channels
 
-        # Publish PWMs to /auv/devices/thrusters
+        # Publish PWMs to /mavros/rc/override
         print(f"[INFO] Channels sent to pixhawk = {pwm}")
         pub_thrusters.publish(pwm)
 

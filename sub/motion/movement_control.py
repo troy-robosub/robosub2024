@@ -1,6 +1,10 @@
 import rospy
-
+from mavros_msgs.srv import CommandBool, SetMode
+from arm import arm_submarine
+from disarm import disarm_submarine
 ## using mavros to apply major motion
+arm_submarine()
+disarm_submarine()
 
 # https://www.ardusub.com/developers/rc-input-and-output.html
 

@@ -29,11 +29,7 @@ def send_command(s, command):
         print(f"Error sending command or receiving response: {err}")
         return None
 
-def main():
-    parser = argparse.ArgumentParser(description="Send command to DVL")
-    parser.add_argument("-c", "--command", required=True, help="Command to send to the DVL")
-    args = parser.parse_args()
-
+def main(cmd):
     # DVL connection parameters
     DVL_IP = '192.168.137.101'  # Update this with your DVL's IP address
     DVL_PORT = 16171
@@ -45,7 +41,7 @@ def main():
         return
 
     # Example command to send
-    command = {"command": args.command}
+    command = {"command": str(cmd)}
     
     # Send the command and get the response
     response = send_command(dvl_socket, command)
@@ -58,5 +54,5 @@ def main():
     # Close the socket connection
     dvl_socket.close()
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+    # main()

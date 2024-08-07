@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+t#!/usr/bin/env python 
 
 # Krishna and Kaileo, with help of Tim
 
@@ -16,17 +16,17 @@ import rospy
 model = YOLO("best50.pt")
 cap = cv2.VideoCapture(-1)
 classes = {0: 'bin', 1: 'bin_bleue', 2: 'bin_rouge', 3: 'buoy', 4: 'gate', 5: 'gate_bleue', 6: 'gate_rouge', 7: 'path', 8: 'torpille', 9: 'torpille_target'}
-frame_size = (640, 480)
+frame_size = (1920, 1080)
+horizontal_degrees_view = 80 # 80 degrees for the lowlight cam, change when diff camera
 frame_center = (frame_size[0] / 2, frame_size[1] / 2)
 
 def find_angle_to_object(x1,y1,x2,y2):
     # W KRISHNA WHO FOUND TIM'S CODE 
-    frame_center = (320, 320)
     object_center = ((x1 + x2) // 2), ((y1 + y2 )// 2)
     
-    angle = np.degrees(np.arctan2(object_center[1] - frame_center[1], 
-                                  object_center[0] - frame_center[0]))
-    return(angle)
+    hori_angle = (x2-x1)/1920 * horizontal_degrees_view
+    
+    return(hori_angle)
 
 def inference(): 
     pub = rospy.Publisher('/inference_results', String, queue_size=10) #try changing the 'chatter' part

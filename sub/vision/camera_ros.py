@@ -29,7 +29,7 @@ def find_angle_to_object(x1,y1,x2,y2):
     return(hori_angle)
 
 def inference(): 
-    pub = rospy.Publisher('/inference_results', String, queue_size=10) #try changing the 'chatter' part
+    pub = rospy.Publisher('/cam/front', String, queue_size=10) #try changing the 'chatter' part
     rospy.init_node('inference', anonymous = True)
     rate = rospy.Rate(10)
     
@@ -61,7 +61,7 @@ def inference():
                 rate.sleep()
                 
             # format
-            # numberofobjects {object1class object1top object1left object1bottom object1right object1anglefromcenter} {object1class object1top object1left object1bottom object1right object1anglefromcenter}
+            # numberofobjects {object1class object1top object1left object1bottom object1right object1anglefromcenter} {object2class object2top object2left object2bottom object2right object1anglefromcenter}
 
 
         # shows the stuff

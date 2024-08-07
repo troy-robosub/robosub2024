@@ -30,7 +30,6 @@ def manualControl(x, y, z, r):
         z,  # thrust for sub, slider on joystick [0,1000]
         r,  # yaw for sub, clockwise/counterclockwise on joystick [-1000,1000], respectively
         0)  # buttons
-    time.sleep(0.05)
 
 
 #check this for sure
@@ -119,7 +118,10 @@ def getDepth(initial_pressure):
     p = 1023.6
     depth = P/(p*g) *(-1)
     return depth
-
+    
+def maintainDepth(initial_depth):
+    angle = initial_depth - getDepth()
+    
 #check for heading in Qgroundcontrol
 def get_heading():
     heading = 0
@@ -332,13 +334,13 @@ def maintainHeading(heading):
     #get the current heading
     start_heading = get_heading()
     #calculate the difference in headings
-    angle = abs(start_heading - heading)
+    angle = float(start_heading - heading) #derek you put abs bruh it cant be negative we changed it to float were lowkey goated
     #if the angle is negative, rotate clockwise (increase heading)
     if angle < 0: 
         rotateClockwise(abs(angle))
     #if the angle is positive, rotate counter-clockwise (decrease heading)
     else: 
-        rotateCounterClockwise(angle)
+        rotateCounterClockwise(abs(angle))
     
         
 # master = mavutil.mavlink_connection('192.168.2.2', baud=57600) #establish connection with pixhawk
@@ -364,8 +366,9 @@ beginning_heading = get_heading()
 print ("beginning heading: " + beginning_heading)
 
 print("DESCENDINGGGGG")
-for i in range(0,60): # 120 at 0.05 good enough for gate 
-    manualControl(0,0,800,0)
+
+manualControl(0,0,800,0)
+time.sleep(2.5)
 
 manualControl(0,0,500,0)
 
@@ -373,8 +376,12 @@ maintainHeading(beginning_heading)
 
 print("going forward")
 
-for i in range(0,150):
-    manualControl(750,0,500,0)
+manualControl(750,0,500,0)
+
+
+time.sleep(10)
+manualControl(0,0,500,0)
+
 
 
 #set_parameters(RC_OVERRIDE_TIME, 0.1)

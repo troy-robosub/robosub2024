@@ -35,6 +35,17 @@ def movement(
         print(f"[INFO] Channels sent to pixhawk = {pwm}")
         pub_thrusters.publish(pwm)
 
+#this uses pymavlink instead of mavros
+# def movement(x, y, z, r):
+#     master.mav.manual_control_send(
+#         master.target_system,
+#         x,  # pitch for sub, back/forward on joystick [-1000,1000], respectively
+#         y,  # roll for sub, left/right on joystick [-1000,1000], respectively
+#         z,  # thrust for sub, slider on joystick [0,1000]
+#         r,  # yaw for sub, clockwise/counterclockwise on joystick [-1000,1000], respectively
+#         0)  # buttons
+#     time.sleep(0.05)
+
 # https://www.ardusub.com/developers/rc-input-and-output.html
 
 # https://github.com/InspirationRobotics/robosub_2024/blob/dac720839070f41935d3b328c7454b22f64cfa0c/auv/motion/robot_control.py#L2

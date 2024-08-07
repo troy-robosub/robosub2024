@@ -19,6 +19,7 @@ def main():
     	data = json.load(f)
     if data["x"] > 9.5:
     	break
+    # change things in movement function as needed
     movement_control.movement(forward=1)
 
   disarm_submarine.disarm_submarine()

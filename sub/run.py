@@ -9,8 +9,8 @@ def main():
   send_dvl_command.main("calibrate_gyro")
   send_dvl_command.main("reset_dead_reckoning")
   subprocess.Popen('roscore', shell=True)
-  subprocess.Popen(['python3', '/dvl/dvl_tcp_parser.py', 'dead_reckoning', '-i', '192.168.137.101'])
-  #subprocess.Popen(['python3', '/dvl/dvl_publisher.py'])
+  subprocess.Popen(['python3', 'dvl/dvl_tcp_parser.py', 'dead_reckoning', '-i', '192.168.137.101'])
+  #subprocess.Popen(['python3', 'dvl/dvl_publisher.py'])
 
 while not rospy.is_shutdown():
     with open('/dvl/out.json', 'r') as f:

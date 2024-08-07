@@ -5,7 +5,7 @@ import rospy
 import subprocess
 
 def main():
-  arm_submarine.arm_submarine
+  arm_submarine.arm_submarine()
   # dvl assisted moving
   send_dvl_command.main("calibrate_gyro")
   send_dvl_command.main("reset_dead_reckoning")

@@ -6,6 +6,7 @@ from std_msgs.msg import Float64, Float32MultiArray
 
 ## using mavros to apply major motion
 
+rospy.init_node('move')
 pub_thrusters = rospy.Publisher("/mavros/rc/override", mavros_msgs.msg.OverrideRCIn, queue_size=10)
 
 def movement(

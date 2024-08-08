@@ -98,6 +98,7 @@ def _handle(message_type, message, time_format, csv_writer):
     if time_format:
         _format_timestamps(message_type, report, time_format)
     print("Current x value: %s" % json.dumps(report["x]))
+    time.sleep(1)
     # Specify file path
     file_path='out.json'
     with open(file_path, 'w') as json_file:

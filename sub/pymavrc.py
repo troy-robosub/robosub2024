@@ -77,9 +77,10 @@ def get_heading():
 
 def forward(duration, pwm=1700): #default pwm is 1600, but can definitely adjust, and duration is in seconds
     send_rc(forward=pwm)
-    for i in range(duration/0.05):
+    for i in range(duration * 20):
         send_rc()
         time.sleep(0.05)
+
     clear_motion()
 
 # def turnHeading(heading):
@@ -102,7 +103,7 @@ def rotateClockwise(degrees):
     #hold altitude and send message
     set_mode("ALT_HOLD")
     print("start heading: " + str(get_heading()))
-    
+
     #the original heading of the vehicle.
     #what is heading? the compass direction in which the craft's nose is pointing
     #https://mavlink.io/en/messages/common.html#ATTITUDE
@@ -119,14 +120,12 @@ def rotateClockwise(degrees):
         print("current heading: " + str(get_heading()))
         # if the desired degrees rotated
         # is greater than the desired rotation (within 4%), stop
-        if current_heading > 0.95 * new_heading and  current_heading < 1.05 * new_heading:
+        if current_heading > 0.90 * new_heading and  current_heading < 1.05 * new_heading:
             break
     #print the rotation reached
         print("ROTATED: ", current_heading)
     #hold altitude
-    for i in range(degrees//20):
-        send_rc(yaw=1400)
-        time.sleep(0.03)
+
     clear_motion()
 
 def status_loop(duration, delay=0.05):
@@ -144,7 +143,7 @@ def clear_motion(stopped_pwm=1500):
         send_rc(*[stopped_pwm]*6)
 
 # master = mavutil.mavlink_connection('192.168.2.2', baud=57600) #establish connection with pixhawk
-master = mavutil.mavlink_connection('/dev/ttyACM0', baud=57600) #establish connection with pixhawk 
+master = mavutil.mavlink_connection('/dev/ttyACM0', baud=57600) #establish connection with pixhawk
 target = (master.target_system, master.target_component)
 
 print("<<<<<<WAITING FOR CONNECTION>>>>>>")
@@ -154,8 +153,17 @@ print("<<<<<<CONNECTION ESTABLISHED>>>>>>")
 
 # for arming
 master.arducopter_arm()
+set_mode("ALT_HOLD")
 
-turnClockwise(90)
+send_rc(throttle=1400)
+time.sleep(2.0)
+send_rc(throttle=1400)
+time.sleep(2.0)
+
+forward(10)
+
+rotateClockwise(180)
+rotateClockwise(180)
 
 clear_motion()
 master.arducopter_disarm()

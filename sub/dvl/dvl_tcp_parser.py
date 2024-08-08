@@ -2,6 +2,7 @@
 
 import argparse
 import csv
+import time
 import datetime
 import json
 import socket
@@ -96,7 +97,7 @@ def _handle(message_type, message, time_format, csv_writer):
     report["log_time"] = int(datetime.datetime.utcnow().timestamp() * 1e6)
     if time_format:
         _format_timestamps(message_type, report, time_format)
-    print(json.dumps(report))
+    print("Current x value: %s" % json.dumps(report["x]))
     # Specify file path
     file_path='out.json'
     with open(file_path, 'w') as json_file:

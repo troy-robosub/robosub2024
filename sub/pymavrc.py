@@ -83,13 +83,13 @@ master.arducopter_arm()
 
 set_mode("STABILIZE")
 
-send_rc("throttle=1600")
+send_rc(throttle=1600)
 
 status_loop(2.0)
 
 print("downwards completed")
 
-send_rc("forward=1600")
+send_rc(forward=1600)
 
 status_loop(4.0)
 

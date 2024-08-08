@@ -119,15 +119,14 @@ def rotateClockwise(degrees):
         print("current heading: " + str(get_heading()))
         # if the desired degrees rotated
         # is greater than the desired rotation (within 4%), stop
-        if current_heading > 0.9 * new_heading and  current_heading < 1.1 * new_heading:
+        if current_heading > 0.95 * new_heading and  current_heading < 1.05 * new_heading:
             break
     #print the rotation reached
         print("ROTATED: ", current_heading)
     #hold altitude
-    for i in range(5):
+    for i in range(degrees//20):
         send_rc(yaw=1400)
-        time.sleep(0.05)
-
+        time.sleep(0.03)
     clear_motion()
 
 def status_loop(duration, delay=0.05):

@@ -22,7 +22,7 @@ def pmove(distance): #distance in meters
   DVL_IP = '192.168.137.101'  # Update this with your DVL's IP address
   DVL_PORT = 16171
   # Connect to the DVL
-  dvl_socket = connect_to_dvl(DVL_IP, DVL_PORT)
+  dvl_socket = send_dvl_command.connect_to_dvl(DVL_IP, DVL_PORT)
   if not dvl_socket:
       print("Failed to connect to DVL")
       return

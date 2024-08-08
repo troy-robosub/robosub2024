@@ -75,7 +75,7 @@ def get_heading():
 
     return heading
 
-def forward(pwm=1600, duration): #default pwm is 1600, but can definitely adjust, and duration is in seconds
+def forward(duration, pwm=1700): #default pwm is 1600, but can definitely adjust, and duration is in seconds
     send_rc(forward=pwm)
     for i in range(duration/0.05):
         send_rc()
@@ -124,6 +124,10 @@ def rotateClockwise(degrees):
     #print the rotation reached
         print("ROTATED: ", current_heading)
     #hold altitude
+    for i in range(5):
+        send_rc(yaw=1400)
+        time.sleep(0.05)
+
     clear_motion()
 
 def status_loop(duration, delay=0.05):

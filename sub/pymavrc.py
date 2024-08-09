@@ -6,17 +6,20 @@ import time
 import threading
 #math operations
 import math
+#dvl stuff
 from dvl.dvl_publisher import dvl_parse
 from dvl import send_dvl_command
 import signal
 import sys
 import json
 import rospy
+from std_msgs.msg import String
 
 
 #global for dvl
 
 current_x=0.0
+current_z=0.0
 def set_mode(modep):
     mode = modep
     mode_id = master.mode_mapping()[mode]

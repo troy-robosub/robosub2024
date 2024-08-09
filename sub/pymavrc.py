@@ -112,7 +112,6 @@ def forward(duration, pwm=1700): #default pwm is 1600, but can definitely adjust
 
 def rotateClockwise(degrees):
     #hold altitude and send message
-    set_mode("ALT_HOLD")
     print("start heading: " + str(get_heading()))
 
     #the original heading of the vehicle.
@@ -131,7 +130,7 @@ def rotateClockwise(degrees):
         print("current heading: " + str(get_heading()))
         # if the desired degrees rotated
         # is greater than the desired rotation (within 4%), stop
-        if current_heading > 0.90 * new_heading and  current_heading < 1.05 * new_heading:
+        if current_heading > 0.95 * new_heading and  current_heading < 1.05 * new_heading:
             break
     #print the rotation reached
         print("ROTATED: ", current_heading)
@@ -139,6 +138,34 @@ def rotateClockwise(degrees):
 
     clear_motion()
 
+def rotateCounterClockwise(degrees):
+    set_mode("MANUAL")
+    print("start heading: " + str(get_heading()))
+
+    #the original heading of the vehicle.
+    #what is heading? the compass direction in which the craft's nose is pointing
+    #https://mavlink.io/en/messages/common.html#ATTITUDE
+    start_heading = get_heading()
+    new_heading = (start_heading - degrees) % 360
+    #run this 10000000 times
+    for i in range(10000000):
+        print(i) # does it only run this loop once?
+        #get current heading, usually after small shift in yaw
+        current_heading = get_heading()
+        #calculate the difference in rotation by degrees
+        #rotate clockwise, no thrust
+        send_rc(yaw=1600)
+        print("current heading: " + str(get_heading()))
+        # if the desired degrees rotated
+        # is greater than the desired rotation (within 4%), stop
+        if current_heading > 0.95 * new_heading and current_heading < 1.05 * new_heading:
+            break
+    #print the rotation reached
+        print("ROTATED: ", current_heading)
+    #hold altitude
+
+    clear_motion()
+    
 def status_loop(duration, delay=0.05):
         ''' Loop for 'duration', with 'delay' between iterations. [s]
         Useful for debugging.
@@ -207,8 +234,8 @@ rospy.Subscriber('information', String, dvl_callback) #
 master.arducopter_arm()
 set_mode("STABILIZE")
 
-dvl_forward(2)
-set_mode("MANUAL")
+#dvl_forward(2)
+#set_mode("MANUAL")
 clear_motion()
 master.arducopter_disarm()
 

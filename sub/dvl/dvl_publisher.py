@@ -8,7 +8,7 @@ def dvl_parse():
 	subprocess.Popen(['python3', 'dvl_tcp_parser.py', 'dead_reckoning', '-i', '192.168.137.101'])
 	topicName='information'
 	#publishing to topic
-	publisher1=rospy.Publisher(topicName,String,queue_size=5)
+	publisher1=rospy.Publisher(topicName,String,queue_size=10)
 	
 	#1Hz means 1 message per second
 	ratePublisher=rospy.Rate(1)

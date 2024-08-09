@@ -2,8 +2,11 @@
 from pymavlink import mavutil
 #timing
 import time
+# for multi-tasking
+import threading
 #math operations
 import math
+from dvl.dvl_publisher import dvl_parse
 
 def set_mode(modep):
     mode = modep
@@ -150,6 +153,14 @@ print("<<<<<<WAITING FOR CONNECTION>>>>>>")
 print("Hi")
 master.wait_heartbeat() #ensure connection is valid
 print("<<<<<<CONNECTION ESTABLISHED>>>>>>")
+
+#begin parsing dead reckoning
+print("STARTING DEAD RECKONING...")
+time.sleep(2)
+rospy.init_node('main_node', anonymous=True)
+dvl_publisher.dvl_parse()
+thread = threading.Thread(target=dvl_parse)
+thread.start()
 
 # for arming
 master.arducopter_arm()

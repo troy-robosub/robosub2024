@@ -7,6 +7,7 @@ import threading
 #math operations
 import math
 from dvl.dvl_publisher import dvl_parse
+from dvl import send_dvl_command
 
 def set_mode(modep):
     mode = modep
@@ -153,6 +154,10 @@ print("<<<<<<WAITING FOR CONNECTION>>>>>>")
 print("Hi")
 master.wait_heartbeat() #ensure connection is valid
 print("<<<<<<CONNECTION ESTABLISHED>>>>>>")
+
+#calibrate and reset dead reckoning
+send_dvl_command.main("calibrate_gyro")
+send_dvl_command.main("reset_dead_reckoning")
 
 #begin parsing dead reckoning
 print("STARTING DEAD RECKONING...")

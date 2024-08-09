@@ -97,7 +97,7 @@ def _handle(message_type, message, time_format, csv_writer):
     report["log_time"] = int(datetime.datetime.utcnow().timestamp() * 1e6)
     if time_format:
         _format_timestamps(message_type, report, time_format)
-    print("Current x value: %s" % json.dumps(report["x]))
+    print("Current x value: %s" % json.dumps(report["x"]))
     time.sleep(1)
     # Specify file path
     file_path='out.json'

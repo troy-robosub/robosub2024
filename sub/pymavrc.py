@@ -11,6 +11,7 @@ from dvl import send_dvl_command
 import signal
 import sys
 import json
+import rospy
 
 
 #global for dvl

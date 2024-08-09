@@ -183,9 +183,11 @@ def clear_motion(stopped_pwm=1500):
 
 def dvl_callback(data):
     global current_x
+    global current_z
     try:
         data_dict = json.loads(data.data)
         current_x = data_dict.get("x", 0.0)
+        current_z = data_dict.get("z", 0.0)
     except json.JSONDecodeError:
         rospy.logerr("JSON Decode Error!")
 
@@ -197,6 +199,14 @@ def dvl_forward(distance,pwm=1600):
         # Replace this with your actual movement command
         send_rc()
         time.sleep(0.05)  # Small delay to allow for callback updates
+
+def dvl_down(depth, pwm=1400):
+    send_dvl_command.main('reset_dead_reckoning')
+    send_rc(throttle=pwm)
+    while current_z <= depth:
+        print(current_z)
+        send_rc()
+        time.sleep(0.05)
 
 def signal_handler(signal, frame):
     set_mode("MANUAL")
@@ -235,6 +245,7 @@ rospy.Subscriber('information', String, dvl_callback) #
 master.arducopter_arm()
 set_mode("STABILIZE")
 
+dvl_down(1)
 #dvl_forward(2)
 #set_mode("MANUAL")
 clear_motion()

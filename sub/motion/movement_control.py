@@ -12,37 +12,41 @@ rospy.init_node('move')
 pub_thrusters = rospy.Publisher("/mavros/rc/override", mavros_msgs.msg.OverrideRCIn, queue_size=10)
 # horizontal degrees view is the point where we make the anlge off of. 
 horizontal_degrees_view = 
-def find_angle_to_object(x1,y1,x2,y2):
+'''def find_angle_to_object(x1,y1,x2,y2):
     # W KRISHNA WHO FOUND TIM'S CODE 
     object_center = ((x1 + x2) // 2), ((y1 + y2 )// 2)
     hori_angle = (x2-x1)/1920 * horizontal_degrees_view
     amtx = 500 - object_center
     return(hori_angle)
 newangle = find_angle_to_object(left,top,right,bottom)
-
+dont need y values for this. 
 '''
 def obj_distance (x1,x2):
     target = (x1+x2)/2
     return (target)
 x = obj_distance (left,right)
 target_difference = 500 - |x|
-while (target_difference > 20):
-    if obj_distance > 500: 
-        # need to go right
-        make the left motors have higher power than right. 
-        make 
-        channels[4] = int 1100
-    else: 
+def adjust_to_target (objdist, targetdiff): 
+    while (targetdiff > 20):
+        pwm = mavros_msgs.msg.OverrideRCIn()
+        channels = [1500] * 18
+        if objdist > 500: 
+            # need to go right
+            #make the left motors have higher power than right.  
+            channels[4] = int (1900)
+        else: 
         # need to go left, elif can be used too. 
-        make the right motors have higher power than left. 
-        channels[4] = int 1900
+        # make the right motors have higher power than left. 
+            channels[4] = int (1100)
+    
+    # publishes the pwm to make the motors move. 
+    #in the conditional loop change the yaw (channel 4). 1000-1100 is left, 2000-1900 is right. 
+    pwm.channels = channels
+    print(f"[INFO] Channels sent to pixhawk = {pwm}")
+    pub_thrusters.publish(pwm)
+adjust_to_target(x,target_difference)
 
-# publishes the pwm to make the motors move. 
-#in the conditional loop change the yaw (channel 4). 1000-1100 is left, 2000-1900 is right. 
-print(f"[INFO] Channels sent to pixhawk = {pwm}")
-        pub_thrusters.publish(pwm)
 
-'''
 
 def movement(
         yaw=None,

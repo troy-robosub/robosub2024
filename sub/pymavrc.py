@@ -158,7 +158,6 @@ print("<<<<<<CONNECTION ESTABLISHED>>>>>>")
 print("STARTING DEAD RECKONING...")
 time.sleep(2)
 rospy.init_node('main_node', anonymous=True)
-dvl_publisher.dvl_parse()
 thread = threading.Thread(target=dvl_parse)
 thread.start()
 

@@ -167,6 +167,15 @@ def dvl_forward(distance,pwm=1600):
         send_rc()
         time.sleep(0.05)  # Small delay to allow for callback updates
 
+def signal_handler(signal, frame):
+    set_mode("MANUAL")
+    clear_motion()
+    print("Ctrl+C pressed, exiting...")
+    sys.exit(0)
+
+# Register the signal handler
+signal.signal(signal.SIGINT, signal_handler)
+
 # master = mavutil.mavlink_connection('192.168.2.2', baud=57600) #establish connection with pixhawk
 master = mavutil.mavlink_connection('/dev/ttyACM0', baud=57600) #establish connection with pixhawk
 target = (master.target_system, master.target_component)
@@ -194,11 +203,7 @@ master.arducopter_arm()
 set_mode("STABILIZE")
 
 dvl_forward(2)
-forward(10)
-
-rotateClockwise(180)
-rotateClockwise(180)
-
+set_mode("MANUAL")
 clear_motion()
 master.arducopter_disarm()
 

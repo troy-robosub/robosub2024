@@ -7,6 +7,7 @@ import threading
 #math operations
 import math
 from dvl.dvl_publisher import dvl_parse
+from dvl import send_dvl_command
 
 def set_mode(modep):
     mode = modep
@@ -145,6 +146,22 @@ def clear_motion(stopped_pwm=1500):
         print("running clear_motion")
         send_rc(*[stopped_pwm]*6)
 
+def callback(data): #this fors the callback function for ros
+    global current_x
+    # Parse the JSON string
+    message = json.loads(data.data)
+    
+    # Update the current x value
+    current_x = message.get("x", 0.0)
+    rospy.loginfo("Current x value: %f", current_x)
+
+def dvl_forward(distance):
+     send_rc(forward=1600)
+     while current_x <= 1:
+        # Replace this with your actual movement command
+        send_rc()
+        time.sleep(0.05)  # Small delay to allow for callback updates
+
 # master = mavutil.mavlink_connection('192.168.2.2', baud=57600) #establish connection with pixhawk
 master = mavutil.mavlink_connection('/dev/ttyACM0', baud=57600) #establish connection with pixhawk
 target = (master.target_system, master.target_component)
@@ -154,12 +171,19 @@ print("Hi")
 master.wait_heartbeat() #ensure connection is valid
 print("<<<<<<CONNECTION ESTABLISHED>>>>>>")
 
+send_dvl_command.main('calibrate_gyro')
+send_dvl_command.main('reset_dead_reckoning')
+
+global current_x # for x value of sub
+
 #begin parsing dead reckoning
 print("STARTING DEAD RECKONING...")
 time.sleep(2)
 rospy.init_node('main_node', anonymous=True)
+dvl_publisher.dvl_parse()
 thread = threading.Thread(target=dvl_parse)
 thread.start()
+
 
 # for arming
 master.arducopter_arm()

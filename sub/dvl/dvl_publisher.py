@@ -5,7 +5,7 @@ import json
 from std_msgs.msg import String
 import subprocess
 def dvl_parse():
-	subprocess.Popen(['python3', 'dvl_tcp_parser.py', 'dead_reckoning', '-i', '192.168.137.101'])
+	subprocess.Popen(['python3', os.path.expanduser("~")+'/robosub2024/sub/dvl/dvl_tcp_parser.py', 'dead_reckoning', '-i', '192.168.137.101'])
 	topicName='information'
 	#publishing to topic
 	publisher1=rospy.Publisher(topicName,String,queue_size=10)

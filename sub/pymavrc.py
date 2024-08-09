@@ -153,7 +153,7 @@ def callback(data): #this fors the callback function for ros
     
     # Update the current x value
     current_x = message.get("x", 0.0)
-    rospy.loginfo("Current x value: %f", current_x)
+    #rospy.loginfo("Current x value: %f", current_x)
 
 def dvl_forward(distance):
      send_rc(forward=1600)

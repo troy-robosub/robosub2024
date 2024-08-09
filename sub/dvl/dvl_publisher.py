@@ -20,7 +20,7 @@ def dvl_parse():
 				data_str=json.dumps(data)
 		except (json.JSONDecodeError):
 			data_str="JSON Decode Error!"
-		rospy.loginfo(data_str)
+		#rospy.loginfo(data_str)
 		#publishing the message
 		publisher1.publish(data_str)
 		

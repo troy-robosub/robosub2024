@@ -8,6 +8,10 @@ import threading
 import math
 from dvl.dvl_publisher import dvl_parse
 from dvl import send_dvl_command
+import signal
+import sys
+import json
+
 
 #global for dvl
 
@@ -149,14 +153,13 @@ def clear_motion(stopped_pwm=1500):
         print("running clear_motion")
         send_rc(*[stopped_pwm]*6)
 
-def callback(data): #this fors the callback function for ros
-    global current_x  # Use the global keyword to modify the global variable
-    # Parse the JSON string
-    message = json.loads(data.data)
-    
-    # Update the current x value
-    current_x = message.get("x", 0.0)
-    #rospy.loginfo("Current x value: %f", current_x)
+def dvl_callback(data):
+    global current_x
+    try:
+        data_dict = json.loads(data.data)
+        current_x = data_dict.get("x", 0.0)
+    except json.JSONDecodeError:
+        rospy.logerr("JSON Decode Error!")
 
 def dvl_forward(distance,pwm=1600):
      send_dvl_command.main('reset_dead_reckoning')
@@ -193,10 +196,12 @@ send_dvl_command.main('calibrate_gyro')
 print("STARTING DEAD RECKONING...")
 time.sleep(2)
 rospy.init_node('main_node', anonymous=True)
-dvl_publisher.dvl_parse()
+#dvl_publisher.dvl_parse()
+
 thread = threading.Thread(target=dvl_parse)
 thread.start()
 
+rospy.Subscriber('information', String, dvl_callback) #
 
 # for arming
 master.arducopter_arm()

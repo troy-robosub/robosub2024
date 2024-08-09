@@ -25,4 +25,3 @@ def dvl_parse():
 		publisher1.publish(data_str)
 		
 		ratePublisher.sleep()
-	

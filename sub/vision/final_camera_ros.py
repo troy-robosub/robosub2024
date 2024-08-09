@@ -18,7 +18,7 @@ import cvzone
 import std_msgs
 from std_msgs.msg import String
 import cv2 
-import math
+import math #as meth
 from ultralytics import YOLO
 import numpy as np
 import rospy
@@ -38,7 +38,7 @@ def movetoCenter(centerx, centery, currx, curry):
     threshx=100
     if currx-centerx>threshx:
         return "left"
-    if currx-centerx<threshx:
+    if currx-centerx<threshx*-1:
         return "right"
     else:
         return "maintain"
@@ -106,17 +106,18 @@ def inference():
                     print(movetoCenter(centerx, centery, c_x, c_y ))
                 
                 # numberofobjects {object1class object1confidence object1top object1left object1bottom object1right}
-                for i in range(len(boxes.cls)):
-            # data will be outputted through ros topic
-                    conf = float(boxes.confidence[i])
-                    left = float(boxes.xyxy[i][0])
-                    top = float(boxes.xyxy[i][1])
-                    right = float(boxes.xyxy[i][2])
-                    bottom = float(boxes.xyxy[i][3])
+            
+            for i in range(len(boxes.cls)):
+                # data will be outputted through ros topic
+                conf = float(boxes.confidence[i])
+                left = float(boxes.xyxy[i][0])
+                top = float(boxes.xyxy[i][1])
+                right = float(boxes.xyxy[i][2])
+                bottom = float(boxes.xyxy[i][3])
             
             # format
-            # numberofobjects {object1class object1confidence object1top object1left object1bottom object1right}
-                    out += " {" + classes[int(boxes.cls[i])] + " " + str(conf) + " " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom) + "} "
+            # numberofobjects {object1class object1confidence  movetoCenter() object1top object1left object1bottom object1right}
+            out += " {" + classes[int(boxes.cls[i])] + " " + str(movetoCenter(centerx, centery, x1 + int((x2-x1)/2), y1 + int((y2-y1)/2))) + " " + str(conf) + " " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom) + "} "
             
 
         pub.publish(out)
@@ -133,46 +134,3 @@ if __name__ == '__main__':
         pass
 
 
-
-
-
-
-
-
-
-"""
-
-
-
-while (True):
-    success, frame = cap.read()
-
-    if success:
-        results = model(source=frame, conf=0.7, imgsz=640)
-
-        boxes = results[0].boxes
-        for i in range(len(boxes.cls)):
-            # print statements will be changed to rospy publish stuff
-            print("")
-            print(classes[int(boxes.cls[i])])
-            print("confidence:", float(boxes.conf[i]))
-            left = float(boxes.xyxy[i][0])
-            top = float(boxes.xyxy[i][1])
-            right = float(boxes.xyxy[i][2])
-            bottom = float(boxes.xyxy[i][3])
-
-            print("left:", left)
-            print("top:", top)
-            print("right:", right)
-            print("bottom:", bottom)
-            print("centroid: (" + str((float(boxes.xyxy[i][0]) + float(boxes.xyxy[i][2])) * 0.5) + ", " + str((float(boxes.xyxy[i][1]) + float(boxes.xyxy[i][3])) * 0.5) + ")")
-            print("offset from center: " + str(320 - (float(boxes.xyxy[i][0]) + float(boxes.xyxy[i][2])) * 0.5) + ", " + str(320 - (float(boxes.xyxy[i][1]) + float(boxes.xyxy[i][3])) * 0.5) + ")")
-            print(find_angle_to_object(left, top, right, bottom))
-
-        cv2.imshow("YOLOv8 Inference (live)", results[0].plot())
-
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-    else:
-        break
-"""

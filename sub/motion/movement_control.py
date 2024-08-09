@@ -24,8 +24,9 @@ dont need y values for this.
 def obj_distance (x1,x2):
     target = (x1+x2)/2
     return (target)
-x = obj_distance (left,right)
-target_difference = 500 - |x|
+#x = obj_distance (left,right)
+#target_difference = 500 - |x|
+
 def adjust_to_target (objdist, targetdiff): 
     while (targetdiff > 20):
         pwm = mavros_msgs.msg.OverrideRCIn()
@@ -44,8 +45,19 @@ def adjust_to_target (objdist, targetdiff):
     pwm.channels = channels
     print(f"[INFO] Channels sent to pixhawk = {pwm}")
     pub_thrusters.publish(pwm)
-adjust_to_target(x,target_difference)
 
+'''
+while True:
+    x = obj_distance (left,right) # this is SUPPOSED to take the "left" and "right" readins from the visio file. not sure if it works though.
+    target_difference = 500 - |x| # probably uses a lot of resources. will make it better later. 
+    adjust_to_target (x, target_difference)
+'''  
+
+while True: 
+    x = obj_distance (left,right)
+    target_difference = 500 - abs(x)
+    if target_difference > 20: 
+        adjust_to_target (x, target_difference)      
 
 
 def movement(

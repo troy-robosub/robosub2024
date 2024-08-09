@@ -156,8 +156,10 @@ def callback(data): #this fors the callback function for ros
     #rospy.loginfo("Current x value: %f", current_x)
 
 def dvl_forward(distance,pwm=1600):
+     send_dvl_command.main('reset_dead_reckoning')
      send_rc(forward=pwm)
      while current_x <= distance:
+        print(current_x)
         # Replace this with your actual movement command
         send_rc()
         time.sleep(0.05)  # Small delay to allow for callback updates
@@ -171,8 +173,10 @@ print("Hi")
 master.wait_heartbeat() #ensure connection is valid
 print("<<<<<<CONNECTION ESTABLISHED>>>>>>")
 
+clear_motion()
+
 send_dvl_command.main('calibrate_gyro')
-send_dvl_command.main('reset_dead_reckoning')
+
 
 global current_x # for x value of sub
 
@@ -187,13 +191,9 @@ thread.start()
 
 # for arming
 master.arducopter_arm()
-set_mode("ALT_HOLD")
+set_mode("STABILIZE")
 
-send_rc(throttle=1400)
-time.sleep(2.0)
-send_rc(throttle=1400)
-time.sleep(2.0)
-
+dvl_forward(2)
 forward(10)
 
 rotateClockwise(180)

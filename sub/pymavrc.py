@@ -155,9 +155,9 @@ def callback(data): #this fors the callback function for ros
     current_x = message.get("x", 0.0)
     #rospy.loginfo("Current x value: %f", current_x)
 
-def dvl_forward(distance):
-     send_rc(forward=1600)
-     while current_x <= 1:
+def dvl_forward(distance,pwm=1600):
+     send_rc(forward=pwm)
+     while current_x <= distance:
         # Replace this with your actual movement command
         send_rc()
         time.sleep(0.05)  # Small delay to allow for callback updates
@@ -289,8 +289,16 @@ def get_heading():
 
     return heading
 
-def forward(duration, pwm=1700): #default pwm is 1600, but can definitely adjust, and duration is in seconds
+def forward(duration, pwm=1700): #default pwm is 1700, but can definitely adjust, and duration is in seconds
     send_rc(forward=pwm)
+    for i in range(duration * 20):
+        send_rc()
+        time.sleep(0.05)
+
+    clear_motion()
+
+def down(duration, pwm=1400): #default pwm is 1400, but can definitely adjust, and duration is in seconds
+    send_rc(throttle=pwm)
     for i in range(duration * 20):
         send_rc()
         time.sleep(0.05)
@@ -380,12 +388,8 @@ thread.start()
 master.arducopter_arm()
 set_mode("ALT_HOLD")
 
-send_rc(throttle=1400)
-time.sleep(2.0)
-send_rc(throttle=1400)
-time.sleep(2.0)
-
-forward(10)
+down(2)
+dvl_forward(1)
 
 rotateClockwise(180)
 rotateClockwise(180)

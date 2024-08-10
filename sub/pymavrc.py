@@ -20,6 +20,7 @@ from std_msgs.msg import String
 
 current_x=0.0
 current_z=0.0
+
 def set_mode(modep):
     mode = modep
     mode_id = master.mode_mapping()[mode]

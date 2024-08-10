@@ -99,6 +99,22 @@ def forward(duration, pwm=1700): #default pwm is 1600, but can definitely adjust
 
     clear_motion()
 
+def left(duration, pwm=1400):
+    send_rc(lateral=pwm)
+    for i in range(duration * 20):
+        send_rc()
+        time.sleep(0.05)
+
+    clear_motion()
+
+def right(duration, pwm=1600):
+    send_rc(lateral=pwm)
+    for i in range(duration * 20):
+        send_rc()
+        time.sleep(0.05)
+
+    clear_motion()
+
 def down(duration, pwm=1400): #default pwm is 1600, but can definitely adjust, and duration is in seconds
     send_rc(throttle=pwm)
     for i in range(duration * 20):

@@ -231,7 +231,7 @@ def dvl_callback(data):
     except json.JSONDecodeError:
         rospy.logerr("JSON Decode Error!")
 
-def dvl_forward(distance,pwm=1600):
+def dvl_forward(distance,pwm=1700):
      send_dvl_command.main('reset_dead_reckoning')
      send_rc(forward=pwm)
      while current_x <= distance:

@@ -200,6 +200,7 @@ def dvl_callback(data):
         data_dict = json.loads(data.data)
         current_x = data_dict.get("x", 0.0)
         current_z = data_dict.get("z", 0.0)
+        print("current_x UPDATED current_z UPDATED")
     except json.JSONDecodeError:
         rospy.logerr("JSON Decode Error!")
 

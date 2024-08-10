@@ -20,6 +20,7 @@ from std_msgs.msg import String
 
 current_x=0.0
 current_z=0.0
+
 def set_mode(modep):
     mode = modep
     mode_id = master.mode_mapping()[mode]
@@ -98,6 +99,14 @@ def forward(duration, pwm=1700): #default pwm is 1600, but can definitely adjust
 
     clear_motion()
 
+def down(duration, pwm=1400): #default pwm is 1600, but can definitely adjust, and duration is in seconds
+    send_rc(throttle=pwm)
+    for i in range(duration * 20):
+        send_rc()
+        time.sleep(0.05)
+
+    clear_motion()
+
 # def turnHeading(heading):
 #     #hold altitude
 #     mode = 'ALT_HOLD'
@@ -158,7 +167,7 @@ def rotateCounterClockwise(degrees):
         current_heading = get_heading()
         #calculate the difference in rotation by degrees
         #rotate clockwise, no thrust
-        send_rc(yaw=1600)
+        send_rc(yaw=1400)
         print("current heading: " + str(get_heading()))
         # if the desired degrees rotated
         # is greater than the desired rotation (within 4%), stop
@@ -191,6 +200,8 @@ def dvl_callback(data):
         data_dict = json.loads(data.data)
         current_x = data_dict.get("x", 0.0)
         current_z = data_dict.get("z", 0.0)
+        print(current_x)
+        print(current_z)
     except json.JSONDecodeError:
         rospy.logerr("JSON Decode Error!")
 
@@ -217,6 +228,10 @@ def signal_handler(signal, frame):
     print("Ctrl+C pressed, exiting...")
     sys.exit(0)
 
+def subscriber_thread():
+    rospy.Subscriber('information', String, dvl_callback)
+    rospy.spin()
+
 # Register the signal handler
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -232,6 +247,7 @@ print("<<<<<<CONNECTION ESTABLISHED>>>>>>")
 clear_motion()
 
 send_dvl_command.main('calibrate_gyro')
+send_dvl_command.main('reset_dead_reckoning')
 
 #begin parsing dead reckoning
 print("STARTING DEAD RECKONING...")
@@ -242,15 +258,17 @@ rospy.init_node('main_node', anonymous=True)
 thread = threading.Thread(target=dvl_parse)
 thread.start()
 
-rospy.Subscriber('information', String, dvl_callback) #
+thread2 = threading.Thread(target=subscriber_thread):
+thread2.start()
 
 # for arming
 master.arducopter_arm()
 set_mode("STABILIZE")
 
-dvl_down(1)
+down(1)
+forward(2)
 #dvl_forward(2)
-#set_mode("MANUAL")
+set_mode("MANUAL")
 clear_motion()
 master.arducopter_disarm()
 

@@ -200,7 +200,8 @@ def dvl_callback(data):
         data_dict = json.loads(data.data)
         current_x = data_dict.get("x", 0.0)
         current_z = data_dict.get("z", 0.0)
-        print("current_x UPDATED current_z UPDATED")
+        print(current_x)
+        print(current_z)
     except json.JSONDecodeError:
         rospy.logerr("JSON Decode Error!")
 
@@ -226,6 +227,10 @@ def signal_handler(signal, frame):
     clear_motion()
     print("Ctrl+C pressed, exiting...")
     sys.exit(0)
+
+def subscriber_thread():
+    rospy.Subscriber('information', String, dvl_callback)
+    rospy.spin()
 
 # Register the signal handler
 signal.signal(signal.SIGINT, signal_handler)
@@ -253,7 +258,8 @@ rospy.init_node('main_node', anonymous=True)
 thread = threading.Thread(target=dvl_parse)
 thread.start()
 
-rospy.Subscriber('information', String, dvl_callback) #
+thread2 = threading.Thread(target=subscriber_thread):
+thread2.start()
 
 # for arming
 master.arducopter_arm()

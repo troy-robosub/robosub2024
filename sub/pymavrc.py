@@ -107,6 +107,14 @@ def down(duration, pwm=1400): #default pwm is 1600, but can definitely adjust, a
 
     clear_motion()
 
+def down(duration, pwm=1600): #default pwm is 1600, but can definitely adjust, and duration is in seconds
+    send_rc(throttle=pwm)
+    for i in range(duration * 20):
+        send_rc()
+        time.sleep(0.05)
+
+    clear_motion()
+
 # def turnHeading(heading):
 #     #hold altitude
 #     mode = 'ALT_HOLD'
@@ -139,11 +147,14 @@ def rotateClockwise(degrees):
         current_heading = get_heading()
         #calculate the difference in rotation by degrees
         #rotate clockwise, no thrust
-        send_rc(yaw=1600)
+        if current_heading > 0.75 * new_heading and current_heading < 1.25 * new_heading:
+            send_rc(yaw=1525)
+        else:
+            send_rc(yaw=1550)
         print("current heading: " + str(get_heading()))
         # if the desired degrees rotated
         # is greater than the desired rotation (within 4%), stop
-        if current_heading > 0.95 * new_heading and  current_heading < 1.05 * new_heading:
+        if current_heading > 0.90 * new_heading and  current_heading < 1.1 * new_heading:
             break
     #print the rotation reached
         print("ROTATED: ", current_heading)
@@ -167,11 +178,14 @@ def rotateCounterClockwise(degrees):
         current_heading = get_heading()
         #calculate the difference in rotation by degrees
         #rotate clockwise, no thrust
-        send_rc(yaw=1400)
+        if current_heading > 0.75 * new_heading and current_heading < 1.25 * new_heading:
+            send_rc(yaw=1475)
+        else:
+            send_rc(yaw=1450)
         print("current heading: " + str(get_heading()))
         # if the desired degrees rotated
         # is greater than the desired rotation (within 4%), stop
-        if current_heading > 0.95 * new_heading and current_heading < 1.05 * new_heading:
+        if current_heading > 0.90 * new_heading and current_heading < 1.00 * new_heading:
             break
     #print the rotation reached
         print("ROTATED: ", current_heading)
@@ -179,6 +193,18 @@ def rotateCounterClockwise(degrees):
 
     clear_motion()
     
+def maintainHeading(heading):
+    set_mode("ALT_HOLD")
+    #get the current heading
+    start_heading = get_heading()
+    #calculate the difference in headings
+    angle = float(start_heading - heading) #derek you put abs bruh it cant be negative we changed it to float were lowkey goated
+    #if the angle is negative, rotate clockwise (increase heading)
+    if angle < 0: 
+        rotateClockwise(abs(angle))
+    #if the angle is positive, rotate counter-clockwise (decrease heading)
+    else: 
+        rotateCounterClockwise(abs(angle))
 def status_loop(duration, delay=0.05):
         ''' Loop for 'duration', with 'delay' between iterations. [s]
         Useful for debugging.
@@ -246,20 +272,20 @@ print("<<<<<<CONNECTION ESTABLISHED>>>>>>")
 
 clear_motion()
 
-send_dvl_command.main('calibrate_gyro')
-send_dvl_command.main('reset_dead_reckoning')
+#send_dvl_command.main('calibrate_gyro')
+#send_dvl_command.main('reset_dead_reckoning')
 
 #begin parsing dead reckoning
 print("STARTING DEAD RECKONING...")
 time.sleep(2)
-rospy.init_node('main_node', anonymous=True)
+#rospy.init_node('main_node', anonymous=True)
 #dvl_publisher.dvl_parse()
 
-thread = threading.Thread(target=dvl_parse)
-thread.start()
+#thread = threading.Thread(target=dvl_parse)
+#thread.start()
 
-thread2 = threading.Thread(target=subscriber_thread):
-thread2.start()
+#thread2 = threading.Thread(target=subscriber_thread)
+#thread2.start()
 
 # for arming
 master.arducopter_arm()

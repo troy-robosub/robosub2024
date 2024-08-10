@@ -21,6 +21,92 @@ from std_msgs.msg import String
 current_x=0.0
 current_z=0.0
 
+import cv2
+import math
+from ultralytics import YOLO
+import cvzone
+
+class Camera:
+    def __init__(self):
+        self.line = 1
+        self.cap = cv2.VideoCapture(0)
+        self.cap.set(3, 1920)
+        self.cap.set(4, 1080)
+        self.totx, self.toty = 1920, 1080
+        self.centerx, self.centery = int(self.totx / 2), int(self.toty / 2)
+        
+        self.model = YOLO("front_cam_comp_data.pt")
+        self.classes = {0: 'gateblue', 1: 'gatered', 2: 'buoy', 3: 'torpedoes', 4: 'torpedo hole', 
+                        5: 'gate', 6: 'torpille', 7: 'y', 8: 'x', 9: 'samples_table', 10: 'path'}
+        self.confidence = 0.8   
+
+    def inference(self, obstacle):
+        success, img = self.cap.read()
+        results = self.model(img, conf=self.confidence)
+
+        img = cv2.line(img, (self.centerx, 0), (self.centerx, self.toty), (0, 255, 0), self.line)
+        img = cv2.line(img, (0, self.centery), (self.totx, self.centery), (0, 255, 0), self.line)
+        cv2.imshow("Image", img)
+
+        for r in results:
+            boxes = r.boxes
+            for box in boxes:
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
+                object_center = ((x1 + x2) // 2), ((y1 + y2) // 2)
+
+                conf = math.ceil(box.conf[0] * 100) / 100
+                cls = int(box.cls[0])
+
+                if self.classes[cls] == obstacle and conf > self.confidence:
+                    self.draw_rectangle(img, x1, y1, x2, y2, cls, conf)
+                    c_x = x1 + int((x2 - x1) / 2)
+                    c_y = y1 + int((y2 - y1) / 2)
+                    return [self.get_direction(c_x, c_y), x1, x2]
+
+        cv2.imshow("Image", img)
+        cv2.waitKey(1)
+
+    def draw_rectangle(self, img, x1, y1, x2, y2, cls, conf):
+        cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 3)
+        cvzone.putTextRect(img, f'{self.classes[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1, thickness=2)
+        c_x = x1 + int((x2 - x1) / 2)
+        c_y = y1 + int((y2 - y1) / 2)
+        cv2.circle(img, (c_x, c_y), radius=10, color=(0, 255, 0), thickness=10)
+
+    def get_direction(self, currx, curry):
+        threshx = 300
+        if currx - self.centerx > threshx:
+            return "right"
+        elif currx - self.centerx < -threshx:
+            return "left"
+        else:
+            return "maintain"
+
+    def distance(self, truesize, x1, x2):
+        focallen = 546.823529
+        return truesize * focallen / abs(x1 - x2)
+
+    def navigate_obstacle(self, obstacle):
+        a = self.inference(obstacle)
+        direction = a[0]
+        while direction in ["right", "left"]:
+            if direction == "right":
+                right(1)
+            else:
+                left(1)
+            a = self.inference(obstacle)
+            direction = a[0]
+
+        if direction == "maintain":
+            distance = self.distance(12, a[1], a[2])
+            print(f"Move forward, {obstacle} distance: {int(distance)}")
+
+    def gatered(self):
+        self.navigate_obstacle("gatered")
+
+    def buoy(self):
+        self.navigate_obstacle("buoy")
+
 def set_mode(modep):
     mode = modep
     mode_id = master.mode_mapping()[mode]
@@ -123,7 +209,7 @@ def down(duration, pwm=1400): #default pwm is 1600, but can definitely adjust, a
 
     clear_motion()
 
-def down(duration, pwm=1600): #default pwm is 1600, but can definitely adjust, and duration is in seconds
+def up(duration, pwm=1600): #default pwm is 1600, but can definitely adjust, and duration is in seconds
     send_rc(throttle=pwm)
     for i in range(duration * 20):
         send_rc()
